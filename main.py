@@ -31,19 +31,6 @@ def parse_avatar_ids_from_cache(cache_dir, output_file):
 
     return avatar_ids
 
-def get_avatar_data(avatar_id):
-    res = requests.get(f"https://api.vrchat.cloud/api/1/avatars/{avatar_id}", headers={
-        "X-Unity-Version": "2019.4.40f1",
-        "X-Platform": "standalonewindows",
-        "Accept": "*/*",
-        "user-agent": "UnityPlayer/2022.3.6f1-DWR (UnityWebRequest/1.0, libcurl/7.80.0-DEV)",
-    })
-    if res.status_code == 429:
-        log.failure(f"Failed to get avatar data for avatar ID {avatar_id}: Rate limited")
-    elif res.status_code == 404:
-        log.failure(f"Avatar ID {avatar_id} not found")
-    else:
-        return res.json() if res.status_code == 200 else None
 
 def load_existing_avatar_ids(file_path):
     if os.path.exists(file_path):
