@@ -1,5 +1,4 @@
 from core import *
-
 def parse_avatar_ids_from_cache(cache_dir, output_file):
     avatar_ids = load_existing_avatar_ids(output_file)
 
@@ -8,13 +7,11 @@ def parse_avatar_ids_from_cache(cache_dir, output_file):
             if os.path.isdir(os.path.join(cache_dir, directory)):
                 for subdirectory in os.listdir(os.path.join(cache_dir, directory)):
                     if os.path.isdir(os.path.join(cache_dir, directory, subdirectory)):
-                        data_file_path = os.path.join(
-                            cache_dir, directory, subdirectory, '__data')
+                        data_file_path = os.path.join(cache_dir, directory, subdirectory, '__data')
                         try:
                             with open(data_file_path, 'r', encoding='utf-8', errors='ignore') as file:
                                 file_content = file.read()
-                                matches = re.findall(
-                                    r'avtr_\w{8}-\w{4}-\w{4}-\w{4}-\w{12}', file_content)
+                                matches = re.findall(r'avtr_\w{8}-\w{4}-\w{4}-\w{4}-\w{12}', file_content)
                                 for avatar_id in matches:
                                     if avatar_id not in avatar_ids:
                                         log.debug(f"[Found avatar ID: {avatar_id}]")
@@ -23,14 +20,12 @@ def parse_avatar_ids_from_cache(cache_dir, output_file):
                                     else:
                                         log.debug(f"[Duplicate avatar ID: {avatar_id}]")
                                     break
-                                
                         except Exception as e:
                             log.failure(f"Error reading {data_file_path}: {str(e)}")
     except Exception as e:
         raise ValueError(f"Error reading cache directory {cache_dir}: {str(e)}")
 
     return avatar_ids
-
 
 def load_existing_avatar_ids(file_path):
     if os.path.exists(file_path):
@@ -41,10 +36,6 @@ def load_existing_avatar_ids(file_path):
 def save_avatar_ids(avatar_ids, file_path='avatar_ids.json'):
     with open(file_path, 'w') as json_file:
         json.dump(avatar_ids, json_file, indent=4)
-
-def save_avatar_data(avatar_data_list, file_path='avatar_data.json'):
-    with open(file_path, 'w') as json_file:
-        json.dump(avatar_data_list, json_file, indent=4)
 
 def main():
     colorama.init()
@@ -60,19 +51,9 @@ def main():
 
     if not avatar_ids:
         log.failure("No avatar IDs found.")
-        return
+    else:
+        log.info(f"Total Avatars Found: {len(avatar_ids)}")
 
-    avatar_data_list = []
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = {executor.submit(get_avatar_data, avatar_id): avatar_id for avatar_id in avatar_ids}
-        for future in concurrent.futures.as_completed(futures):
-            avatar_data = future.result()
-            if avatar_data:
-                avatar_data_list.append(avatar_data)
-
-    save_avatar_data(avatar_data_list)
-    log.info(f"Total Avatars Retrieved: {len(avatar_data_list)}")
     log.ask("Press Enter To Exit")
 
 if __name__ == "__main__":
